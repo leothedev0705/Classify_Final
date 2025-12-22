@@ -126,3 +126,15 @@ coverage/
 Thumbs.db
 .DS_Store
 desktop.ini
+
+# NuGet
+.nuget/
+nuget.exe
+*.nupkg
+
+# Build artifacts
+build/
+*.iml
+studex_flutter.iml
+studex.iml
+flutter_01.png
