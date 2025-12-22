@@ -1,0 +1,5 @@
+# Placeholder for assets/images directory
+# Add your image files here:
+# - home-girl.png (dashboard illustration)
+# - login-img.png (login screen illustration)
+# - Any other images used in the app

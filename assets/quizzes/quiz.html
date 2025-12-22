@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Quiz Platform</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Computer Engineering Quiz Platform</h1>
+    
+    <div id="home-screen">
+      <h2>Select a Subject</h2>
+      <div class="subject-grid">
+        <div class="subject-card" data-subject="dsa">
+          <h3>Data Structures & Algorithms</h3>
+          <p>Test your knowledge of arrays, linked lists, trees, and algorithms</p>
+        </div>
+        <div class="subject-card" data-subject="python">
+          <h3>Python Programming</h3>
+          <p>Test your Python programming skills and concepts</p>
+        </div>
+        <div class="subject-card" data-subject="ai">
+          <h3>Artificial Intelligence</h3>
+          <p>Test your understanding of AI concepts and algorithms</p>
+        </div>
+        <div class="subject-card" data-subject="dbms">
+          <h3>Database Management Systems</h3>
+          <p>Test your knowledge of SQL, normalization, and database concepts</p>
+        </div>
+        <div class="subject-card" data-subject="cn">
+          <h3>Computer Networks</h3>
+          <p>Test your understanding of networking protocols and architecture</p>
+        </div>
+      </div>
+    </div>
+    
+    <div id="quiz-screen" class="hidden">
+      <div id="quiz-header">
+        <h2 id="quiz-title">Subject Quiz</h2>
+        <div id="quiz-info">
+          <span id="question-counter">Question 1/10</span>
+          <span id="timer">Time: 00:00</span>
+        </div>
+      </div>
+      
+      <div id="question-container">
+        <h3 id="question-text">Question text goes here</h3>
+        <div id="options-container">
+          <!-- Options will be inserted here by JavaScript -->
+        </div>
+      </div>
+      
+      <div id="quiz-controls">
+        <button id="prev-btn">Previous</button>
+        <button id="next-btn">Next</button>
+        <button id="submit-btn" class="hidden">Submit Quiz</button>
+      </div>
+    </div>
+    
+    <div id="results-screen" class="hidden">
+      <h2>Quiz Results</h2>
+      <div id="score-display">
+        <h3>Your Score: <span id="score-value">0/10</span></h3>
+        <p id="score-percentage">0%</p>
+      </div>
+      
+      <div id="attempts-history">
+        <h3>Previous Attempts</h3>
+        <div id="attempts-list">
+          <!-- Previous attempts will be listed here -->
+        </div>
+      </div>
+      
+      <div id="results-controls">
+        <button id="review-btn">Review Answers</button>
+        <button id="retry-btn">Retry Quiz</button>
+        <button id="home-btn">Back to Home</button>
+      </div>
+    </div>
+  </div>
+  
+  <script src="quiz-data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html> 

@@ -1,0 +1,24 @@
+{
+  "name": "quiz-platform",
+  "version": "1.0.0",
+  "description": "Quiz platform for computer engineering subjects",
+  "main": "main.js",
+  "scripts": {
+    "start": "npx electron .",
+    "dev": "npx electron .",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "quiz",
+    "electron",
+    "learning"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "electron": "^28.3.3"
+  },
+  "devDependencies": {
+    "electron-builder": "^24.6.4"
+  }
+}

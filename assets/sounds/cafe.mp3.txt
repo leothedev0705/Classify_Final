@@ -1,0 +1,4 @@
+# Placeholder for cafe.mp3
+# This would be an actual MP3 file with cafe ambience
+# Duration: 10-30 minutes, looped
+# Quality: 128kbps

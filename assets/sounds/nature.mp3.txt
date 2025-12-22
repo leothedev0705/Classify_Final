@@ -1,0 +1,4 @@
+# Placeholder for nature.mp3
+# This would be an actual MP3 file with nature sounds
+# Duration: 10-30 minutes, looped
+# Quality: 128kbps
