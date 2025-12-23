@@ -11,12 +11,16 @@ class StudySessionProvider extends ChangeNotifier {
   bool _isPaused = false;
   List<String> _tasks = [];
   
+  StudySession? _currentSession;
+  
   // Timer properties
   int _totalSeconds = 0;
   int _remainingSeconds = 0;
+  int _breakDuration = 0; // in minutes
   DateTime? _sessionStartTime;
   Timer? _timer;
   bool _isRunning = false;
+  bool _isBreak = false;
   
   // Section tracking
   String? _currentSection;
@@ -36,13 +40,29 @@ class StudySessionProvider extends ChangeNotifier {
   bool get isKioskMode => _isKioskMode;
   bool get isPaused => _isPaused;
   bool get isRunning => _isRunning;
+  bool get isBreak => _isBreak;
   List<String> get tasks => _tasks;
+  StudySession? get currentSession => _currentSession;
+  int get remainingSeconds => _remainingSeconds;
 
   String get formattedTime {
     final hours = _remainingSeconds ~/ 3600;
     final minutes = (_remainingSeconds % 3600) ~/ 60;
     final seconds = _remainingSeconds % 60;
     return '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}:${seconds.toString().padLeft(2, '0')}';
+  }
+  
+  String get formattedTimeRemaining {
+    final hours = _remainingSeconds ~/ 3600;
+    final minutes = (_remainingSeconds % 3600) ~/ 60;
+    final seconds = _remainingSeconds % 60;
+    if (hours > 0) {
+      return '${hours}h ${minutes}m ${seconds}s';
+    } else if (minutes > 0) {
+      return '${minutes}m ${seconds}s';
+    } else {
+      return '${seconds}s';
+    }
   }
 
   String get sessionLabel {
@@ -134,7 +154,15 @@ class StudySessionProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  void startSession({String? technique, int? durationHours}) {
+  void startSession({
+    String? technique,
+    int? durationHours,
+    int? duration,
+    int? breakDuration,
+    List<String>? tasks,
+    String? notes,
+    String? ambientSound,
+  }) {
     // Stop any existing timer
     _timer?.cancel();
     
@@ -146,6 +174,7 @@ class StudySessionProvider extends ChangeNotifier {
     _isKioskMode = true;
     _isRunning = true;
     _isPaused = false;
+    _isBreak = false;
     _sessionStartTime = DateTime.now();
     
     // Use provided technique or default
@@ -153,30 +182,64 @@ class StudySessionProvider extends ChangeNotifier {
       _selectedTechnique = technique;
     }
     
-    // Calculate duration in seconds based on hours provided or technique default
-    if (durationHours != null) {
+    // Set tasks if provided
+    if (tasks != null) {
+      _tasks = List.from(tasks);
+    }
+    
+    // Set ambient sound if provided
+    if (ambientSound != null) {
+      _selectedSound = ambientSound;
+    }
+    
+    // Calculate duration in seconds
+    if (duration != null) {
+      _totalSeconds = duration * 60; // Convert minutes to seconds
+    } else if (durationHours != null) {
       _totalSeconds = durationHours * 3600; // Convert hours to seconds
     } else {
       // Set duration based on technique
       switch (_selectedTechnique) {
         case 'pomodoro':
-          _totalSeconds = 120 * 60; // 2 hours default
+          _totalSeconds = 25 * 60; // 25 minutes default
           break;
-        case 'flow':
-          _totalSeconds = 60 * 60; // 1 hour default
+        case 'feynman':
+          _totalSeconds = 45 * 60; // 45 minutes default
           break;
-        case 'timeblocking':
-          _totalSeconds = 180 * 60; // 3 hours default
-          break;
-        case 'deepfocus':
-          _totalSeconds = 120 * 60; // 2 hours default
+        case 'deep':
+          _totalSeconds = 90 * 60; // 90 minutes default
           break;
         default:
           _totalSeconds = 60 * 60; // 1 hour default
       }
     }
     
+    // Set break duration
+    if (breakDuration != null) {
+      _breakDuration = breakDuration;
+    } else {
+      // Default break duration based on technique
+      switch (_selectedTechnique) {
+        case 'pomodoro':
+          _breakDuration = 5;
+          break;
+        default:
+          _breakDuration = 10;
+      }
+    }
+    
     _remainingSeconds = _totalSeconds;
+    
+    // Create current session
+    _currentSession = StudySession(
+      technique: _selectedTechnique,
+      duration: _totalSeconds ~/ 60,
+      breakDuration: _breakDuration,
+      startTime: _sessionStartTime!,
+      tasks: List.from(_tasks),
+      notes: notes ?? '',
+      ambientSound: _selectedSound,
+    );
     
     // Start the timer
     _startTimer();
@@ -204,9 +267,40 @@ class StudySessionProvider extends ChangeNotifier {
   }
   
   void _onTimerComplete() {
+    if (!_isBreak) {
+      // Study time completed, start break
+      _isBreak = true;
+      _remainingSeconds = _breakDuration * 60;
+      _startTimer();
+      notifyListeners();
+    } else {
+      // Break completed, end session
+      _timer?.cancel();
+      _isRunning = false;
+      _isBreak = false;
+      endSession();
+    }
+  }
+  
+  void stopSession() {
     _timer?.cancel();
+    _isKioskMode = false;
+    _isPaused = false;
     _isRunning = false;
-    // You can add notification or sound here
+    _isBreak = false;
+    _remainingSeconds = 0;
+    _totalSeconds = 0;
+    _breakDuration = 0;
+    _sessionStartTime = null;
+    _currentSection = null;
+    _sectionStartTime = null;
+    _sectionTimeSpent = {};
+    _currentSession = null;
+    
+    // Stop ambient sound
+    _audioPlayer.stop();
+    _isPlayingSound = false;
+    
     notifyListeners();
   }
 
@@ -295,9 +389,6 @@ class StudySessionProvider extends ChangeNotifier {
     // Initialize study session provider
   }
 
-  Map<String, dynamic>? get currentSession => null; // Return null for now
-  bool get isBreak => false; // Return false for now
-  String get formattedTimeRemaining => '${_remainingSeconds ~/ 60}:${(_remainingSeconds % 60).toString().padLeft(2, '0')}';
   Duration get todayStudyTime => Duration(minutes: 0); // Return 0 for now
   int get sessionsCount => 0; // Return 0 for now
   Duration get weeklyStudyTime => Duration(minutes: 0); // Return 0 for now

@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:studex_flutter/providers/study_session_provider.dart';
 import 'package:studex_flutter/constants/app_constants.dart';
 import 'package:studex_flutter/widgets/study_session_widgets.dart';
+import 'package:studex_flutter/screens/kiosk_mode_screen.dart';
 
 class StudySessionScreen extends StatefulWidget {
   const StudySessionScreen({super.key});
@@ -530,6 +531,14 @@ class _StudySessionScreenState extends State<StudySessionScreen> {
       tasks: _tasks,
       notes: _notesController.text,
       ambientSound: _selectedAmbientSound,
+    );
+    
+    // Navigate to kiosk mode screen - this replaces the entire navigation stack
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(
+        builder: (context) => const KioskModeScreen(),
+      ),
+      (route) => false, // Remove all previous routes
     );
   }
 
